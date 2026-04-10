@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-ai-po"
-version = "0.1.0"
+version = "0.1.1"
 description = "AI-powered .po file translator for Django using LiteLLM"
 readme = "README.md"
 license = {text = "MIT"}
@@ -42,8 +42,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ismail/django-ai-po"
-Repository = "https://github.com/ismail/django-ai-po"
+Homepage = "https://github.com/ismail-mosa/django-ai-po"
+Repository = "https://github.com/ismail-mosa/django-ai-po"
 
 [tool.setuptools.packages.find]
 include = ["django_ai_po*"]
