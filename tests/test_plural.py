@@ -1,6 +1,7 @@
 import polib
 
 from django_ai_po.plural import (
+    _match_msgid_whitespace,
     apply_plural_translations,
     build_plural_payload,
     get_plural_count,
@@ -60,6 +61,38 @@ class TestApplyPluralTranslations:
         assert e.msgstr_plural[0] == "قطة"
         assert e.msgstr_plural[1] == "قطط"
         assert "fuzzy" not in e.flags
+
+    def test_preserves_newline_prefix(self):
+        e = polib.POEntry(msgid="\ncat", msgid_plural="\ncats")
+        apply_plural_translations(e, ["قطة", "قطط"])
+        assert e.msgstr_plural[0] == "\nقطة"
+        assert e.msgstr_plural[1] == "\nقطط"
+
+
+class TestMatchMsgidWhitespace:
+    def test_leading_newline_added(self):
+        result = _match_msgid_whitespace("\nHello", "مرحبا")
+        assert result == "\nمرحبا"
+
+    def test_leading_newline_already_present(self):
+        result = _match_msgid_whitespace("\nHello", "\nمرحبا")
+        assert result == "\nمرحبا"
+
+    def test_trailing_whitespace_added(self):
+        result = _match_msgid_whitespace("Hello  ", "مرحبا")
+        assert result == "مرحبا  "
+
+    def test_both_leading_and_trailing(self):
+        result = _match_msgid_whitespace("\nHello  ", "مرحبا")
+        assert result == "\nمرحبا  "
+
+    def test_no_special_whitespace(self):
+        result = _match_msgid_whitespace("Hello", "مرحبا")
+        assert result == "مرحبا"
+
+    def test_empty_msgstr(self):
+        result = _match_msgid_whitespace("\nHello", "")
+        assert result == ""
 
 
 class TestSeparateEntries:

@@ -1,6 +1,6 @@
 import json
 
-from django_ai_po.translator.base import POTranslator
+from django_ai_po.translator.base import POTranslator, _match_msgid_whitespace
 
 
 class TestExtractJson:
@@ -166,6 +166,11 @@ class TestResolveLangCode:
         from django_ai_po.translator.base import resolve_lang_code
 
         assert resolve_lang_code("Klingon") == "klingon"
+
+
+class TestMatchMsgidWhitespaceInTranslator:
+    def test_imported_and_available(self):
+        assert _match_msgid_whitespace("\nHello", "مرحبا") == "\nمرحبا"
 
 
 def _make_translator(**kwargs):

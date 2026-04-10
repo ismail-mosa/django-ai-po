@@ -29,9 +29,23 @@ def build_plural_payload(entry: polib.POEntry, num_forms: int) -> Dict:
 
 def apply_plural_translations(entry: polib.POEntry, translations: List[str]) -> None:
     for i, trans in enumerate(translations):
-        entry.msgstr_plural[i] = trans
+        ref = entry.msgid if i == 0 else entry.msgid_plural
+        entry.msgstr_plural[i] = _match_msgid_whitespace(ref, trans)
     if "fuzzy" in entry.flags:
         entry.flags.remove("fuzzy")
+
+
+def _match_msgid_whitespace(msgid: str, msgstr: str) -> str:
+    if not msgid or not msgstr:
+        return msgstr
+    starts_newline = msgid[0] == "\n"
+    ends_whitespace = msgid[-1] in (" ", "\t") and msgid.strip() != msgid
+    if starts_newline and not msgstr.startswith("\n"):
+        msgstr = "\n" + msgstr
+    if ends_whitespace and not msgstr[-1] in (" ", "\t"):
+        trailing = msgid[len(msgid.rstrip(" \t")) :]
+        msgstr = msgstr + trailing
+    return msgstr
 
 
 def separate_entries(

@@ -213,7 +213,7 @@ class POTranslator:
                             if self.validators:
                                 trans = validate_translation(trans, entry.msgid, self.validators)
                             if not dry_run:
-                                entry.msgstr = trans
+                                entry.msgstr = _match_msgid_whitespace(entry.msgid, trans)
                                 if "fuzzy" in entry.flags:
                                     entry.flags.remove("fuzzy")
                         success += len(batch_entries)
@@ -424,3 +424,16 @@ class POTranslator:
     def _chunked(lst: List, size: int):
         for i in range(0, len(lst), size):
             yield lst[i : i + size]
+
+
+def _match_msgid_whitespace(msgid: str, msgstr: str) -> str:
+    if not msgid or not msgstr:
+        return msgstr
+    starts_newline = msgid[0] == "\n"
+    ends_whitespace = msgid[-1] in (" ", "\t") and msgid.strip() != msgid
+    if starts_newline and not msgstr.startswith("\n"):
+        msgstr = "\n" + msgstr
+    if ends_whitespace and not msgstr[-1] in (" ", "\t"):
+        trailing = msgid[len(msgid.rstrip(" \t")) :]
+        msgstr = msgstr + trailing
+    return msgstr
